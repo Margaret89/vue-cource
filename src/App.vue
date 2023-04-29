@@ -1,18 +1,28 @@
 <template>
 	<div class="app">
 		<h1>Страница с постами</h1>
-		<input type="text" v-model.trim="modificatorValue">
 
-		<my-button @click="fetchPosts">Получить посты</my-button>
+		<div class="app__btns">
+			<my-button
+				@click="showDialog"
+			>
+				Создать пост
+			</my-button>
 
-		<my-button @click="showDialog" style="margin: 20px 0;">Создать пост</my-button>
+			<my-select
+				v-model="selectedSort"
+				:options="sortOptions"
+			/>
+		</div>
+
+		<!-- <input type="text" v-model.trim="modificatorValue"> -->
 
 		<my-dialog v-model:show='dialogVisible'>
 			<post-form @create = "creatPost"/>
 		</my-dialog>
 
 		<post-list
-			:posts="posts" 
+			:posts="sortedPosts" 
 			@remove="removePost"
 			v-if="!isPostLoading"
 		/>
@@ -42,6 +52,11 @@ export default {
 			dialogVisible: false,
 			modificatorValue: '',
 			isPostLoading: false,
+			selectedSort: '',
+			sortOptions: [
+				{value: 'title', name: 'По названию'},
+				{value: 'body', name: 'По содержимому'},
+			]
 		}
 	},
 	methods: {
@@ -69,7 +84,12 @@ export default {
 	},
 	mounted() {
 		this.fetchPosts();
-	}
+	},
+	computed: {
+		sortedPosts() {
+			return [...this.posts].sort((post1, post2) => {return post1[this.selectedSort]?.localeCompare(post2[this.selectedSort])});
+		}
+	},
 }
 </script>
 
@@ -83,4 +103,10 @@ export default {
 }
 
 .app{padding: 20px;}
+
+.app__btns{
+	display: flex;
+	justify-content: space-between;
+	margin: 20px 0;
+}
 </style>

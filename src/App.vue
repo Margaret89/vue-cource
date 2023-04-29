@@ -12,9 +12,12 @@
 		</my-dialog>
 
 		<post-list
-			 :posts="posts" 
-			 @remove="removePost"
+			:posts="posts" 
+			@remove="removePost"
+			v-if="!isPostLoading"
 		/>
+
+		<div v-else>Идет загрузка...</div>
 	</div>
 </template>
 
@@ -29,14 +32,16 @@ export default {
 	},
 	data() {
 		return{
-			posts: [
-				{id:1, title:'Javascript', body:'Описание поста'},
-				{id:2, title:'Javascript 2', body:'Описание поста 2'},
-				{id:3, title:'Javascript 3', body:'Описание поста 3'},
-				{id:4, title:'Javascript 4', body:'Описание поста 4'},
-			],
+			posts: [],
+			// posts: [
+			// 	{id:1, title:'Javascript', body:'Описание поста'},
+			// 	{id:2, title:'Javascript 2', body:'Описание поста 2'},
+			// 	{id:3, title:'Javascript 3', body:'Описание поста 3'},
+			// 	{id:4, title:'Javascript 4', body:'Описание поста 4'},
+			// ],
 			dialogVisible: false,
 			modificatorValue: '',
+			isPostLoading: false,
 		}
 	},
 	methods: {
@@ -52,12 +57,18 @@ export default {
 		},
 		async fetchPosts() {
 			try {
+				this.isPostLoading = true;
 				const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
-				console.log(response);
+				this.posts = response.data;
 			} catch (e) {
 				alert('Ошибка')
+			} finally {
+				this.isPostLoading = false;
 			}
 		}
+	},
+	mounted() {
+		this.fetchPosts();
 	}
 }
 </script>
